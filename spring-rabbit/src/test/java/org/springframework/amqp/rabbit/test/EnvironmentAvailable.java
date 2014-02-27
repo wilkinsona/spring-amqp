@@ -15,11 +15,11 @@ package org.springframework.amqp.rabbit.test;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Assume;
-import org.junit.rules.MethodRule;
-import org.junit.runners.model.FrameworkMethod;
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-public class EnvironmentAvailable implements MethodRule {
+public class EnvironmentAvailable implements TestRule {
 
 	private static Log logger = LogFactory.getLog(EnvironmentAvailable.class);
 
@@ -35,7 +35,12 @@ public class EnvironmentAvailable implements MethodRule {
 		this(DEFAULT_ENVIRONMENT_KEY);
 	}
 
-	public Statement apply(final Statement base, final FrameworkMethod method, Object target) {
+	public boolean isActive() {
+		return System.getProperty(key) != null;
+	}
+
+	@Override
+	public Statement apply(final Statement base, Description description) {
 		return new Statement() {
 			@Override
 			public void evaluate() throws Throwable {
@@ -44,10 +49,6 @@ public class EnvironmentAvailable implements MethodRule {
 				base.evaluate();
 			}
 		};
-	}
-
-	public boolean isActive() {
-		return System.getProperty(key) != null;
 	}
 
 }

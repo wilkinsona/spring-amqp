@@ -27,9 +27,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-
 import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.Queue;
@@ -72,13 +72,13 @@ public class MessageListenerBrokerInterruptionIntegrationTests {
 
 	private SimpleMessageListenerContainer container;
 
-	@Rule
+	@ClassRule
 	public static EnvironmentAvailable environment = new EnvironmentAvailable("BROKER_INTEGRATION_TEST");
 
 	/*
 	 * Ensure broker dies if a test fails (otherwise the erl process might have to be killed manually)
 	 */
-	@Rule
+	@ClassRule
 	public static BrokerPanic panic = new BrokerPanic();
 
 	@Rule

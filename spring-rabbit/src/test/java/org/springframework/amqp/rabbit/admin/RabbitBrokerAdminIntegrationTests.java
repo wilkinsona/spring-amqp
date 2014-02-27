@@ -22,6 +22,7 @@ import java.util.Map;
 import org.apache.log4j.Level;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.amqp.core.Queue;
@@ -44,13 +45,13 @@ public class RabbitBrokerAdminIntegrationTests {
 	@Rule
 	public Log4jLevelAdjuster logLevel = new Log4jLevelAdjuster(Level.INFO, RabbitBrokerAdmin.class);
 
-	@Rule
+	@ClassRule
 	public static EnvironmentAvailable environment = new EnvironmentAvailable("BROKER_INTEGRATION_TEST");
 
 	/*
 	 * Ensure broker dies if a test fails (otherwise the erl process might have to be killed manually)
 	 */
-	@Rule
+	@ClassRule
 	public static BrokerPanic panic = new BrokerPanic();
 
 	private static RabbitBrokerAdmin brokerAdmin;

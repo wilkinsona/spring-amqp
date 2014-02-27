@@ -9,8 +9,6 @@
 
 package org.springframework.amqp.support.converter;
 
-import static org.codehaus.jackson.map.type.TypeFactory.type;
-
 import java.io.IOException;
 
 import org.apache.commons.logging.Log;
@@ -130,7 +128,7 @@ public class JsonMessageConverter extends AbstractJsonMessageConverter {
 			Class<?> targetClass) throws JsonParseException,
 			JsonMappingException, IOException {
 		String contentAsString = new String(body, encoding);
-		return jsonObjectMapper.readValue(contentAsString, type(targetClass));
+		return jsonObjectMapper.readValue(contentAsString, jsonObjectMapper.getTypeFactory().constructType(targetClass));
 	}
 
 	@Override
@@ -154,8 +152,8 @@ public class JsonMessageConverter extends AbstractJsonMessageConverter {
 		}
 
 		if (getClassMapper() == null) {
-			getJavaTypeMapper().fromJavaType(type(objectToConvert.getClass()),
-					messageProperties);
+			getJavaTypeMapper().fromJavaType(
+					jsonObjectMapper.getTypeFactory().constructType(objectToConvert.getClass()), messageProperties);
 
 		}
 		else {

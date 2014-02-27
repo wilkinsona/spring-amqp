@@ -24,6 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Level;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.amqp.rabbit.test.BrokerTestUtils;
@@ -44,7 +45,7 @@ public class RabbitBrokerAdminLifecycleIntegrationTests {
 	@Rule
 	public Log4jLevelAdjuster logLevel = new Log4jLevelAdjuster(Level.INFO, RabbitBrokerAdmin.class);
 
-	@Rule
+	@ClassRule
 	public static EnvironmentAvailable environment = new EnvironmentAvailable("BROKER_INTEGRATION_TEST");
 
 	@Before

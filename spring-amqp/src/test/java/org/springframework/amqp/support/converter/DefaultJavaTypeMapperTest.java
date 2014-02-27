@@ -8,20 +8,18 @@
  */
 package org.springframework.amqp.support.converter;
 
-import static org.codehaus.jackson.map.type.TypeFactory.collectionType;
-import static org.codehaus.jackson.map.type.TypeFactory.mapType;
-import static org.codehaus.jackson.map.type.TypeFactory.type;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.junit.matchers.JUnitMatchers.containsString;
 import static org.mockito.BDDMockito.given;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.codehaus.jackson.map.type.TypeFactory;
 import org.codehaus.jackson.type.JavaType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,6 +34,8 @@ import org.springframework.amqp.core.MessageProperties;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultJavaTypeMapperTest {
+
+   private final TypeFactory typeFactory = TypeFactory.defaultInstance();
    @Spy
    DefaultJavaTypeMapper javaTypeMapper = new DefaultJavaTypeMapper();
    private final MessageProperties properties = new MessageProperties();
@@ -66,7 +66,7 @@ public class DefaultJavaTypeMapperTest {
 
       JavaType javaType = javaTypeMapper.toJavaType(properties);
 
-      assertThat(javaType, equalTo(type(String.class)));
+      assertThat(javaType, equalTo(typeFactory.constructType(String.class)));
    }
 
    @Test
@@ -76,12 +76,12 @@ public class DefaultJavaTypeMapperTest {
 
       JavaType javaType = javaTypeMapper.toJavaType(properties);
 
-      assertEquals(javaType, type(SimpleTrade.class));
+      assertEquals(javaType, typeFactory.constructType(SimpleTrade.class));
    }
 
    @Test
    public void fromJavaTypeShouldPopulateWithJavaTypeNameByDefault() {
-      javaTypeMapper.fromJavaType(type(SimpleTrade.class), properties);
+      javaTypeMapper.fromJavaType(typeFactory.constructType(SimpleTrade.class), properties);
 
       String className = (String) properties.getHeaders().get(javaTypeMapper.getClassIdFieldName());
       assertThat(className, equalTo(SimpleTrade.class.getName()));
@@ -92,7 +92,7 @@ public class DefaultJavaTypeMapperTest {
       javaTypeMapper.setIdClassMapping(map("daytrade", SimpleTrade.class));
       javaTypeMapper.afterPropertiesSet();
 
-      javaTypeMapper.fromJavaType(type(SimpleTrade.class), properties);
+      javaTypeMapper.fromJavaType(typeFactory.constructType(SimpleTrade.class), properties);
 
       String className = (String) properties.getHeaders().get(javaTypeMapper.getClassIdFieldName());
       assertThat(className, equalTo("daytrade"));
@@ -121,7 +121,7 @@ public class DefaultJavaTypeMapperTest {
 
       JavaType javaType = javaTypeMapper.toJavaType(properties);
 
-      assertThat(javaType, equalTo(collectionType(ArrayList.class, String.class)));
+      assertThat(javaType, equalTo((JavaType)typeFactory.constructCollectionType(ArrayList.class, String.class)));
    }
 
    @Test
@@ -136,14 +136,15 @@ public class DefaultJavaTypeMapperTest {
 
       JavaType javaType = javaTypeMapper.toJavaType(properties);
 
-      assertThat(javaType, equalTo(collectionType(containerClass, type(SimpleTrade.class))));
+      assertThat(javaType, equalTo((JavaType)typeFactory.constructCollectionType(
+    		  containerClass, typeFactory.constructType(SimpleTrade.class))));
    }
 
    @Test
    public void fromJavaTypeShouldPopulateWithContentTypeJavaTypeNameByDefault() {
 
-      javaTypeMapper.fromJavaType(collectionType(containerClass, type(SimpleTrade.class)),
-                                  properties);
+      javaTypeMapper.fromJavaType((JavaType)typeFactory.constructCollectionType(
+    		  containerClass, typeFactory.constructType(SimpleTrade.class)),properties);
 
       String className = (String) properties.getHeaders().get(javaTypeMapper.getClassIdFieldName());
       String contentClassName = (String) properties.getHeaders().get(javaTypeMapper.getContentClassIdFieldName());
@@ -177,7 +178,7 @@ public class DefaultJavaTypeMapperTest {
 
       JavaType javaType = javaTypeMapper.toJavaType(properties);
 
-      assertThat(javaType, equalTo(mapType(HashMap.class, Integer.class, String.class)));
+      assertThat(javaType, equalTo((JavaType)typeFactory.constructMapType(HashMap.class, Integer.class, String.class)));
    }
 
    @Test
@@ -194,15 +195,15 @@ public class DefaultJavaTypeMapperTest {
       JavaType javaType = javaTypeMapper.toJavaType(properties);
 
       assertThat(javaType,
-                 equalTo(mapType(mapClass, type(SimpleTrade.class),
-                                             type(String.class))));
+                 equalTo((JavaType)typeFactory.constructMapType(mapClass, typeFactory.constructType(SimpleTrade.class),
+                		 typeFactory.constructType(String.class))));
    }
 
    @Test
    public void fromJavaTypeShouldPopulateWithKeyTypeAndContentJavaTypeNameByDefault() {
 
-      javaTypeMapper.fromJavaType(mapType(mapClass, type(SimpleTrade.class),
-                                                      type(String.class)), properties);
+      javaTypeMapper.fromJavaType(typeFactory.constructMapType(mapClass, typeFactory.constructType(SimpleTrade.class),
+    		  typeFactory.constructType(String.class)), properties);
 
       String className = (String) properties.getHeaders().get(javaTypeMapper.getClassIdFieldName());
       String contentClassName = (String) properties.getHeaders().get(javaTypeMapper.getContentClassIdFieldName());

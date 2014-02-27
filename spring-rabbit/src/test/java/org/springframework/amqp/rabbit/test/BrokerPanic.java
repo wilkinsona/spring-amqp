@@ -12,12 +12,12 @@
  */
 package org.springframework.amqp.rabbit.test;
 
-import org.junit.rules.MethodRule;
-import org.junit.runners.model.FrameworkMethod;
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.springframework.amqp.rabbit.admin.RabbitBrokerAdmin;
 
-public class BrokerPanic implements MethodRule {
+public class BrokerPanic implements TestRule {
 
 	private RabbitBrokerAdmin brokerAdmin;
 
@@ -28,7 +28,8 @@ public class BrokerPanic implements MethodRule {
 		this.brokerAdmin = brokerAdmin;
 	}
 
-	public Statement apply(final Statement base, final FrameworkMethod method, Object target) {
+	@Override
+	public Statement apply(final Statement base, Description description) {
 		return new Statement() {
 			@Override
 			public void evaluate() throws Throwable {

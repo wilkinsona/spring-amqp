@@ -6,13 +6,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import junit.framework.Assert;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.springframework.amqp.rabbit.test.BrokerTestUtils;
 import org.springframework.amqp.rabbit.test.EnvironmentAvailable;
@@ -38,7 +37,7 @@ public class JInterfaceIntegrationTests {
 
 	private RabbitBrokerAdmin brokerAdmin;
 
-	@Rule
+	@ClassRule
 	public static EnvironmentAvailable environment = new EnvironmentAvailable("BROKER_INTEGRATION_TEST");
 
 	@Before

@@ -22,10 +22,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Assume;
 import org.junit.internal.AssumptionViolatedException;
-import org.junit.rules.TestWatchman;
-import org.junit.runners.model.FrameworkMethod;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
-
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
@@ -58,7 +57,7 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  *
  */
-public class BrokerRunning extends TestWatchman {
+public class BrokerRunning extends TestWatcher {
 
 	private static final String DEFAULT_QUEUE_NAME = BrokerRunning.class.getName();
 
@@ -154,7 +153,7 @@ public class BrokerRunning extends TestWatchman {
 	}
 
 	@Override
-	public Statement apply(Statement base, FrameworkMethod method, Object target) {
+	public Statement apply(Statement base, Description description) {
 
 		// Check at the beginning, so this can be used as a static field
 		if (assumeOnline) {
@@ -204,7 +203,7 @@ public class BrokerRunning extends TestWatchman {
 			connectionFactory.destroy();
 		}
 
-		return super.apply(base, method, target);
+		return super.apply(base, description);
 
 	}
 

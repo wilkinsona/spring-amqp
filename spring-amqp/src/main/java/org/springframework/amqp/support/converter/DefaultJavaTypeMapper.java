@@ -8,15 +8,11 @@
  */
 package org.springframework.amqp.support.converter;
 
-import static org.codehaus.jackson.map.type.TypeFactory.collectionType;
-import static org.codehaus.jackson.map.type.TypeFactory.mapType;
-import static org.codehaus.jackson.map.type.TypeFactory.type;
-
 import java.util.Collection;
 import java.util.Map;
 
+import org.codehaus.jackson.map.type.TypeFactory;
 import org.codehaus.jackson.type.JavaType;
-
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.util.ClassUtils;
 
@@ -27,6 +23,8 @@ import org.springframework.util.ClassUtils;
  * @author Artem Bilan
  */
 public class DefaultJavaTypeMapper extends AbstractJavaTypeMapper implements JavaTypeMapper, ClassMapper {
+
+	private final TypeFactory typeFactory = TypeFactory.defaultInstance();
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public JavaType toJavaType(MessageProperties properties) {
@@ -39,14 +37,14 @@ public class DefaultJavaTypeMapper extends AbstractJavaTypeMapper implements Jav
 		JavaType contentClassType = getClassIdType(retrieveHeader(properties,
 				getContentClassIdFieldName()));
 		if (classType.getKeyType() == null) {
-			return collectionType(
+			return typeFactory.constructCollectionType(
 					(Class<? extends Collection>) classType.getRawClass(),
 					contentClassType);
 		}
 
 		JavaType keyClassType = getClassIdType(retrieveHeader(properties,
 				getKeyClassIdFieldName()));
-		return mapType(
+		return typeFactory.constructMapType(
 				(Class<? extends Map>) classType.getRawClass(), keyClassType,
 				contentClassType);
 
@@ -54,11 +52,11 @@ public class DefaultJavaTypeMapper extends AbstractJavaTypeMapper implements Jav
 
 	private JavaType getClassIdType(String classId) {
 		if (getIdClassMapping().containsKey(classId)) {
-			return type(getIdClassMapping().get(classId));
+			return typeFactory.constructType(getIdClassMapping().get(classId));
 		}
 
 		try {
-			return type(ClassUtils.forName(classId, getClass()
+			return typeFactory.constructType(ClassUtils.forName(classId, getClass()
 					.getClassLoader()));
 		}
 		catch (ClassNotFoundException e) {
@@ -89,7 +87,7 @@ public class DefaultJavaTypeMapper extends AbstractJavaTypeMapper implements Jav
 	}
 
 	public void fromClass(Class<?> clazz, MessageProperties properties) {
-		fromJavaType(type(clazz), properties);
+		fromJavaType(typeFactory.constructType(clazz), properties);
 
 	}
 
